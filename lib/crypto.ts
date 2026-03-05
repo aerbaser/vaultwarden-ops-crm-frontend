@@ -8,5 +8,5 @@ export async function deriveLoginKey(email: string, password: string, kdfIterati
   const masterKey = new Uint8Array(masterKeyBits);
   const hmacKey = await crypto.subtle.importKey('raw', masterKey, { name: 'HMAC', hash: 'SHA-256' }, false, ['sign']);
   const hashBuf = await crypto.subtle.sign('HMAC', hmacKey, enc.encode(`${email}${password}`));
-  return btoa(String.fromCharCode(...new Uint8Array(hashBuf)));
+  return btoa(Array.from(new Uint8Array(hashBuf), b => String.fromCharCode(b)).join(''));
 }
