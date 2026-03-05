@@ -1,0 +1,18 @@
+:root {
+  --font-body: "IBM Plex Sans", "Segoe UI", sans-serif;
+  --font-heading: "Space Grotesk", "Segoe UI", sans-serif;
+  --surface-canvas: #f5f7fb;
+  --surface-card: #ffffff;
+  --surface-muted: #e8edf5;
+  --text-primary: #111827;
+  --text-muted: #4b5563;
+  --brand: #005f73;
+  --brand-strong: #003d4d;
+  --border-soft: #cfd8e3;
+  --danger: #b42318;
+  --warning: #b54708;
+  --success: #067647;
+  --radius-md: 12px;
+  --radius-lg: 18px;
+  --shadow-soft: 0 12px 26px rgba(13, 26, 38, 0.08);
+}
