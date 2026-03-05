@@ -1,0 +1,17 @@
+.btn {
+  display: inline-flex; align-items: center; gap: 6px;
+  font-family: var(--font-sans); font-size: 11px; font-weight: 600;
+  letter-spacing: 0.08em; text-transform: uppercase;
+  padding: 7px 14px; border-radius: var(--radius);
+  border: 1px solid transparent; cursor: pointer;
+  transition: all 120ms ease; white-space: nowrap;
+}
+.btn:disabled { opacity: 0.4; cursor: not-allowed; }
+.primary { background: var(--amber); color: #0a0b0f; border-color: var(--amber); }
+.primary:hover:not(:disabled) { background: #e8bc6a; }
+.ghost { background: transparent; color: var(--text-2); border-color: var(--border); }
+.ghost:hover:not(:disabled) { border-color: var(--amber-dim); color: var(--text-1); }
+.danger { background: transparent; color: var(--danger); border-color: var(--danger); }
+.danger:hover:not(:disabled) { background: var(--danger-glow); }
+.spinner { width: 12px; height: 12px; border: 2px solid transparent; border-top-color: currentColor; border-radius: 50%; animation: spin 0.6s linear infinite; }
+@keyframes spin { to { transform: rotate(360deg); } }

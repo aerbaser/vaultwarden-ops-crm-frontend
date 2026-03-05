@@ -1,0 +1,66 @@
+.root { display: flex; flex-direction: column; height: 100vh; overflow: hidden; background: var(--bg-0); }
+
+/* Topbar */
+.topbar { height: 48px; display: flex; align-items: center; gap: 24px; padding: 0 16px; background: var(--bg-1); border-bottom: 1px solid var(--border); flex-shrink: 0; }
+.brand { font-family: var(--font-mono); font-size: 13px; font-weight: 600; letter-spacing: 0.1em; color: var(--amber); display: flex; align-items: center; gap: 8px; }
+.nav { display: flex; align-items: center; gap: 2px; flex: 1; }
+.navLink { font-size: 11px; font-weight: 600; letter-spacing: 0.06em; text-transform: uppercase; color: var(--text-3); padding: 5px 10px; border-radius: var(--radius); text-decoration: none; transition: color 100ms; }
+.navLink:hover { color: var(--text-1); }
+.navActive { color: var(--amber) !important; }
+.topRight { display: flex; align-items: center; gap: 10px; margin-left: auto; }
+.emailLabel { font-size: 11px; color: var(--text-3); font-family: var(--font-mono); }
+
+/* Workspace */
+.workspace { display: flex; flex: 1; overflow: hidden; }
+
+/* Sidebar */
+.sidebar { width: 180px; background: var(--bg-1); border-right: 1px solid var(--border); overflow-y: auto; flex-shrink: 0; padding: 12px 8px; }
+.sideSection { display: flex; flex-direction: column; gap: 2px; }
+.sideLabel { font-size: 9px; font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase; color: var(--text-3); padding: 8px 8px 4px; }
+.sideItem { display: block; width: 100%; text-align: left; font-size: 12px; color: var(--text-2); background: transparent; border: none; border-radius: var(--radius); padding: 6px 8px; cursor: pointer; transition: all 80ms; }
+.sideItem:hover { background: var(--bg-2); color: var(--text-1); }
+.sideItemActive { background: var(--bg-3) !important; color: var(--amber) !important; }
+
+/* Cipher list */
+.listPanel { flex: 1; overflow-y: auto; background: var(--bg-0); padding: 8px; display: flex; flex-direction: column; gap: 2px; }
+.emptyState { color: var(--text-3); font-size: 12px; font-family: var(--font-mono); padding: 32px; text-align: center; }
+.cipherRow { display: flex; align-items: center; gap: 10px; padding: 10px 12px; background: var(--bg-1); border: 1px solid var(--border-dim); border-radius: var(--radius); cursor: pointer; text-align: left; transition: all 80ms; width: 100%; }
+.cipherRow:hover { border-color: var(--border); background: var(--bg-2); }
+.cipherRowActive { border-color: var(--amber-dim) !important; background: var(--bg-2) !important; }
+.typeDot { width: 6px; height: 6px; border-radius: 50%; flex-shrink: 0; }
+.dotTeal { background: var(--teal); }
+.dotAmber { background: var(--amber); }
+.dotMuted { background: var(--text-3); }
+.cipherInfo { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 2px; }
+.cipherName { font-size: 13px; color: var(--text-1); font-weight: 500; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.cipherSub { font-size: 11px; color: var(--text-3); font-family: var(--font-mono); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+
+/* Detail panel */
+.detailPanel { width: 320px; background: var(--bg-1); border-left: 1px solid var(--border); overflow-y: auto; flex-shrink: 0; animation: slideIn 150ms ease-out; }
+.detailHeader { display: flex; align-items: flex-start; justify-content: space-between; padding: 16px; border-bottom: 1px solid var(--border); gap: 8px; }
+.detailName { font-size: 14px; font-weight: 600; color: var(--text-1); flex: 1; }
+.detailActions { display: flex; align-items: center; gap: 6px; }
+.closeBtn { background: transparent; border: none; color: var(--text-3); cursor: pointer; font-size: 14px; padding: 2px 6px; border-radius: 4px; }
+.closeBtn:hover { color: var(--text-1); }
+.fields { padding: 16px; display: flex; flex-direction: column; gap: 16px; }
+.field { display: flex; flex-direction: column; gap: 6px; padding: 16px; }
+.fieldLabel { font-size: 10px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; color: var(--text-3); }
+.fieldMono { font-family: var(--font-mono); font-size: 12px; color: var(--text-1); word-break: break-all; }
+.fieldValueRow { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+.copyBtn { font-size: 9px; font-weight: 600; letter-spacing: 0.06em; text-transform: uppercase; padding: 3px 7px; border-radius: 4px; border: 1px solid var(--border); background: transparent; color: var(--text-2); cursor: pointer; transition: all 80ms; white-space: nowrap; }
+.copyBtn:hover { border-color: var(--amber-dim); color: var(--amber); }
+.flashed { animation: copyFlash 300ms ease-out; }
+.notes { font-size: 12px; color: var(--text-2); line-height: 1.6; white-space: pre-wrap; padding: 0 16px 16px; }
+
+/* Modal */
+.modalBackdrop { position: fixed; inset: 0; background: rgba(7,8,12,0.8); display: flex; align-items: center; justify-content: center; z-index: 100; backdrop-filter: blur(2px); }
+.modal { width: 420px; background: var(--bg-1); border: 1px solid var(--border); border-radius: 10px; padding: 24px; display: flex; flex-direction: column; gap: 16px; animation: scaleIn 150ms ease-out; }
+.modalTitle { font-size: 13px; font-weight: 600; color: var(--text-1); }
+.modalFields { display: flex; gap: 12px; }
+.modalFields > * { flex: 1; }
+.shareError { font-size: 12px; color: var(--danger); }
+.shareUrlBox { background: var(--amber-glow); border: 1px solid var(--amber-dim); border-radius: var(--radius); padding: 12px; display: flex; flex-direction: column; gap: 6px; }
+.shareUrlLabel { font-size: 9px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; color: var(--amber-dim); }
+.shareUrlRow { display: flex; align-items: center; gap: 8px; }
+.shareUrlText { font-family: var(--font-mono); font-size: 11px; color: var(--amber); flex: 1; word-break: break-all; }
+.modalFooter { display: flex; justify-content: flex-end; gap: 8px; }

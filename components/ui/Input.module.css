@@ -1,0 +1,9 @@
+.wrap { display: flex; flex-direction: column; gap: 4px; }
+.label { font-size: 10px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; color: var(--text-3); }
+.input {
+  font-family: var(--font-sans); font-size: 13px; color: var(--text-1);
+  background: var(--bg-2); border: 1px solid var(--border); border-radius: var(--radius);
+  padding: 8px 10px; width: 100%; outline: none; transition: border-color 120ms;
+}
+.input:focus { border-color: var(--amber-dim); }
+.input::placeholder { color: var(--text-3); }

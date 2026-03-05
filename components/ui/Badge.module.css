@@ -1,0 +1,5 @@
+.badge { display: inline-flex; align-items: center; padding: 2px 7px; border-radius: 100px; font-size: 10px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; border: 1px solid; }
+.amber { color: var(--amber); border-color: var(--amber-dim); background: var(--amber-glow); }
+.teal { color: var(--teal); border-color: var(--teal-dim); background: rgba(61,217,196,0.08); }
+.danger { color: var(--danger); border-color: var(--danger); background: var(--danger-glow); }
+.muted { color: var(--text-3); border-color: var(--border); background: transparent; }
