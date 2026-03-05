@@ -1,10 +1,13 @@
 'use client';
 import { useEffect, useState } from 'react';
 import { apiGet, apiPost } from '@/lib/api';
+import AppShell from '@/components/layout/AppShell';
 import Badge from '@/components/ui/Badge';
 import Button from '@/components/ui/Button';
 import Input from '@/components/ui/Input';
 import styles from './operations.module.css';
+
+type Anomaly = { id: string; name: string; anomalyType: string; severity?: string };
 
 function dueBadge(dateStr: string): { color: 'danger' | 'amber' | 'muted'; label: string } {
   if (!dateStr) return { color: 'muted', label: 'No due date' };
@@ -18,6 +21,8 @@ function dueBadge(dateStr: string): { color: 'danger' | 'amber' | 'muted'; label
 
 export default function OperationsPage() {
   const [obligations, setObligations] = useState<any[]>([]);
+  const [anomalies, setAnomalies] = useState<Anomaly[]>([]);
+  const [dismissed, setDismissed] = useState<Set<string>>(new Set());
   const [loading, setLoading] = useState(true);
   const [showForm, setShowForm] = useState(false);
   const [form, setForm] = useState({ name: '', kind: 'subscription', amount: '', currency: 'USD', cadence: 'monthly', dueDate: '' });
@@ -26,6 +31,7 @@ export default function OperationsPage() {
 
   useEffect(() => {
     apiGet('/api/obligations').then(setObligations).catch(() => {}).finally(() => setLoading(false));
+    apiGet('/api/obligations/anomalies').then(setAnomalies).catch(() => {});
   }, []);
 
   async function submit(e: React.FormEvent) {
@@ -38,27 +44,23 @@ export default function OperationsPage() {
     } catch (e: any) { setError(e.message ?? 'Failed'); } finally { setSaving(false); }
   }
 
-  const nav = [
-    { label: 'Vault', href: '/vault' },
-    { label: 'Operations', href: '/operations', active: true },
-    { label: 'Audit', href: '/audit' },
-  ];
+  const visibleAnomalies = anomalies.filter(a => !dismissed.has(a.id));
 
   return (
-    <div className={styles.root}>
-      <header className={styles.topbar}>
-        <div className={styles.brand}>🔐 <span>VAULT OPS</span></div>
-        <nav className={styles.nav}>
-          {nav.map(n => (
-            <a key={n.href} href={n.href} className={`${styles.navLink} ${n.active ? styles.navActive : ''}`}>{n.label}</a>
-          ))}
-        </nav>
-        <div className={styles.topRight}>
-          <Button variant="primary" onClick={() => setShowForm(true)}>New Subscription</Button>
-        </div>
-      </header>
-
+    <AppShell nav="operations" topAction={<Button variant="primary" onClick={() => setShowForm(true)}>New Subscription</Button>}>
       <div className={styles.content}>
+        {visibleAnomalies.length > 0 && (
+          <div className={styles.anomalies}>
+            {visibleAnomalies.map(a => (
+              <div key={a.id} className={`${styles.anomalyCard} ${styles[a.severity ?? 'medium']}`}>
+                <Badge color={a.severity === 'high' ? 'danger' : 'amber'}>{a.severity ?? 'warning'}</Badge>
+                <span className={styles.anomalyName}>{a.name}</span>
+                <span className={styles.anomalyType}>{a.anomalyType}</span>
+                <button className={styles.anomalyDismiss} onClick={() => setDismissed(prev => new Set([...prev, a.id]))}>✕</button>
+              </div>
+            ))}
+          </div>
+        )}
         {loading && <div className={styles.empty}>Loading…</div>}
         {!loading && obligations.length === 0 && <div className={styles.empty}>No obligations yet.</div>}
         <div className={styles.grid}>
@@ -115,6 +117,6 @@ export default function OperationsPage() {
           </div>
         </div>
       )}
-    </div>
+    </AppShell>
   );
 }

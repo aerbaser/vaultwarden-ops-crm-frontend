@@ -1,0 +1,14 @@
+.root { display: flex; flex-direction: column; height: 100vh; overflow: hidden; background: var(--bg-0); }
+
+.topbar { height: 48px; display: flex; align-items: center; gap: 24px; padding: 0 16px; background: var(--bg-1); border-bottom: 1px solid var(--border); flex-shrink: 0; }
+.brand { font-family: var(--font-mono); font-size: 13px; font-weight: 600; letter-spacing: 0.1em; color: var(--amber); display: flex; align-items: center; gap: 8px; white-space: nowrap; }
+.nav { display: flex; align-items: center; gap: 2px; flex: 1; }
+.navLink { font-size: 11px; font-weight: 600; letter-spacing: 0.06em; text-transform: uppercase; color: var(--text-3); padding: 5px 10px; border-radius: var(--radius); text-decoration: none; transition: color 100ms; white-space: nowrap; }
+.navLink:hover { color: var(--text-1); }
+.navActive { color: var(--amber) !important; }
+.topRight { display: flex; align-items: center; gap: 10px; margin-left: auto; flex-shrink: 0; }
+.emailLabel { font-size: 11px; color: var(--text-3); font-family: var(--font-mono); max-width: 160px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+
+.workspace { display: flex; flex: 1; overflow: hidden; }
+.sidebar { width: 180px; background: var(--bg-1); border-right: 1px solid var(--border); overflow-y: auto; flex-shrink: 0; }
+.main { flex: 1; overflow-y: auto; }

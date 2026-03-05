@@ -1,0 +1,55 @@
+.layout { display: flex; height: 100%; overflow: hidden; }
+
+/* List */
+.listPanel { width: 280px; flex-shrink: 0; border-right: 1px solid var(--border); display: flex; flex-direction: column; overflow: hidden; }
+.searchBar { padding: 10px 10px 8px; border-bottom: 1px solid var(--border-dim); }
+.empty { color: var(--text-3); font-size: 12px; padding: 32px; text-align: center; }
+.row { display: flex; align-items: center; gap: 10px; padding: 10px 12px; background: transparent; border: none; cursor: pointer; text-align: left; width: 100%; border-bottom: 1px solid var(--border-dim); transition: background 80ms; }
+.row:hover { background: var(--bg-2); }
+.rowActive { background: var(--bg-2) !important; }
+.rowAvatar { width: 28px; height: 28px; border-radius: 50%; background: var(--bg-3); border: 1px solid var(--border); display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 600; color: var(--amber); flex-shrink: 0; font-family: var(--font-mono); }
+.rowInfo { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 2px; }
+.rowName { font-size: 13px; color: var(--text-1); font-weight: 500; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.rowRole { font-size: 10px; color: var(--text-3); text-transform: uppercase; letter-spacing: 0.06em; }
+.channelCount { font-size: 10px; font-family: var(--font-mono); color: var(--text-3); background: var(--bg-3); padding: 2px 5px; border-radius: 8px; }
+
+/* Detail */
+.detail { flex: 1; overflow-y: auto; }
+.detailEmpty { display: flex; align-items: center; justify-content: center; height: 100%; }
+.detailHeader { display: flex; align-items: flex-start; gap: 12px; padding: 20px; border-bottom: 1px solid var(--border); }
+.detailAvatar { width: 40px; height: 40px; border-radius: 50%; background: var(--bg-3); border: 1px solid var(--border); display: flex; align-items: center; justify-content: center; font-size: 16px; font-weight: 600; color: var(--amber); flex-shrink: 0; font-family: var(--font-mono); }
+.detailName { font-size: 16px; font-weight: 600; color: var(--text-1); margin-bottom: 6px; }
+.closeBtn { margin-left: auto; background: transparent; border: none; color: var(--text-3); cursor: pointer; font-size: 14px; padding: 2px 6px; border-radius: 4px; }
+.closeBtn:hover { color: var(--text-1); }
+
+.channels { padding: 16px 20px; }
+.sectionLabel { font-size: 9px; font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase; color: var(--text-3); margin-bottom: 10px; }
+.noChannels { font-size: 12px; color: var(--text-3); }
+.channelRow { display: flex; align-items: center; gap: 10px; padding: 8px 10px; background: var(--bg-1); border: 1px solid var(--border-dim); border-radius: var(--radius); margin-bottom: 6px; }
+.channelIcon { font-size: 13px; color: var(--amber); width: 16px; text-align: center; }
+.channelType { font-size: 10px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.06em; color: var(--text-3); width: 60px; flex-shrink: 0; }
+.channelValue { font-family: var(--font-mono); font-size: 12px; color: var(--text-1); flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; }
+.copyBtn { font-size: 9px; font-weight: 600; letter-spacing: 0.06em; text-transform: uppercase; padding: 3px 7px; border-radius: 4px; border: 1px solid var(--border); background: transparent; color: var(--text-2); cursor: pointer; transition: all 80ms; flex-shrink: 0; }
+.copyBtn:hover { border-color: var(--amber-dim); color: var(--amber); }
+.flashed { animation: copyFlash 300ms ease-out; }
+
+.meta { padding: 0 20px 16px; display: flex; align-items: center; gap: 8px; }
+.metaLabel { font-size: 10px; text-transform: uppercase; letter-spacing: 0.06em; color: var(--text-3); }
+.metaValue { font-size: 11px; font-family: var(--font-mono); color: var(--text-2); }
+
+/* Modal */
+.backdrop { position: fixed; inset: 0; background: rgba(7,8,12,0.8); display: flex; align-items: center; justify-content: center; z-index: 100; backdrop-filter: blur(2px); }
+.modal { width: 480px; max-height: 90vh; overflow-y: auto; background: var(--bg-1); border: 1px solid var(--border); border-radius: 10px; padding: 24px; display: flex; flex-direction: column; gap: 14px; animation: scaleIn 150ms ease-out; }
+.modalTitle { font-size: 13px; font-weight: 600; color: var(--text-1); }
+.modalForm { display: flex; flex-direction: column; gap: 12px; }
+.channelsSection { display: flex; flex-direction: column; gap: 8px; }
+.channelFormRow { display: flex; align-items: center; gap: 8px; }
+.typeSelect { background: var(--bg-2); border: 1px solid var(--border); border-radius: var(--radius); color: var(--text-1); font-size: 12px; padding: 6px 8px; font-family: var(--font-sans); cursor: pointer; }
+.valueInput { flex: 1; background: var(--bg-2); border: 1px solid var(--border); border-radius: var(--radius); color: var(--text-1); font-size: 12px; padding: 6px 10px; font-family: var(--font-mono); outline: none; }
+.valueInput:focus { border-color: var(--amber-dim); }
+.removeBtn { background: transparent; border: none; color: var(--text-3); cursor: pointer; font-size: 12px; padding: 4px 6px; border-radius: 4px; }
+.removeBtn:hover { color: var(--danger); }
+.addChannelBtn { font-size: 11px; color: var(--teal); background: transparent; border: 1px dashed var(--teal-dim); border-radius: var(--radius); padding: 6px 12px; cursor: pointer; transition: all 80ms; text-align: left; }
+.addChannelBtn:hover { background: rgba(61,217,196,0.06); }
+.error { font-size: 12px; color: var(--danger); }
+.modalFooter { display: flex; justify-content: flex-end; gap: 8px; }

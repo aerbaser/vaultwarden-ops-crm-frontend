@@ -1,0 +1,31 @@
+.page { padding: 20px 24px; display: flex; flex-direction: column; gap: 16px; height: 100%; overflow-y: auto; }
+
+.filterBar { display: flex; gap: 6px; flex-wrap: wrap; }
+.filter { font-size: 11px; font-weight: 600; letter-spacing: 0.05em; background: var(--bg-1); border: 1px solid var(--border); border-radius: 20px; padding: 4px 12px; color: var(--text-3); cursor: pointer; transition: all 80ms; }
+.filter:hover { color: var(--text-1); border-color: var(--border); }
+.filterActive { background: var(--bg-3) !important; color: var(--amber) !important; border-color: var(--amber-dim) !important; }
+.filterCount { font-size: 10px; font-family: var(--font-mono); margin-left: 4px; }
+
+.empty { color: var(--text-3); font-size: 13px; padding: 48px; text-align: center; }
+
+.grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 12px; }
+
+.card { background: var(--bg-1); border: 1px solid var(--border); border-radius: 8px; padding: 16px; display: flex; flex-direction: column; gap: 8px; transition: border-color 100ms; }
+.card:hover { border-color: var(--border); background: var(--bg-2); }
+.cardHeader { display: flex; align-items: center; justify-content: space-between; }
+.cardIcon { font-size: 18px; }
+.cardName { font-size: 14px; font-weight: 600; color: var(--text-1); }
+.cardProvider { font-size: 11px; color: var(--text-3); font-family: var(--font-mono); }
+.cardRef { font-size: 10px; color: var(--teal); font-family: var(--font-mono); word-break: break-all; text-decoration: none; }
+.cardRef:hover { text-decoration: underline; }
+.cardDate { font-size: 10px; color: var(--text-3); margin-top: auto; font-family: var(--font-mono); }
+
+.backdrop { position: fixed; inset: 0; background: rgba(7,8,12,0.8); display: flex; align-items: center; justify-content: center; z-index: 100; backdrop-filter: blur(2px); }
+.modal { width: 420px; background: var(--bg-1); border: 1px solid var(--border); border-radius: 10px; padding: 24px; display: flex; flex-direction: column; gap: 14px; animation: scaleIn 150ms ease-out; }
+.modalTitle { font-size: 13px; font-weight: 600; color: var(--text-1); }
+.modalForm { display: flex; flex-direction: column; gap: 12px; }
+.formField { display: flex; flex-direction: column; gap: 6px; }
+.fieldLabel { font-size: 10px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.08em; color: var(--text-3); }
+.kindSelect { background: var(--bg-2); border: 1px solid var(--border); border-radius: var(--radius); color: var(--text-1); font-size: 13px; padding: 8px 10px; font-family: var(--font-sans); cursor: pointer; }
+.error { font-size: 12px; color: var(--danger); }
+.modalFooter { display: flex; justify-content: flex-end; gap: 8px; }

@@ -1,0 +1,45 @@
+.sidebar { padding: 12px 8px; display: flex; flex-direction: column; gap: 2px; }
+.sideHeader { display: flex; align-items: center; justify-content: space-between; padding: 4px 8px 8px; }
+.sideLabel { font-size: 9px; font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase; color: var(--text-3); }
+.addBtn { background: transparent; border: none; color: var(--text-3); cursor: pointer; font-size: 16px; padding: 0 4px; border-radius: 4px; line-height: 1; }
+.addBtn:hover { color: var(--amber); }
+.sideEmpty { font-size: 11px; color: var(--text-3); padding: 8px; }
+.sideItem { display: block; width: 100%; text-align: left; font-size: 12px; color: var(--text-2); background: transparent; border: none; border-radius: var(--radius); padding: 6px 8px; cursor: pointer; transition: all 80ms; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.sideItem:hover { background: var(--bg-2); color: var(--text-1); }
+.sideItemActive { background: var(--bg-3) !important; color: var(--amber) !important; }
+
+.emptyMain { display: flex; align-items: center; justify-content: center; height: 100%; }
+.content { height: 100%; display: flex; flex-direction: column; }
+.contentHeader { padding: 20px 24px 0; }
+.projectName { font-size: 18px; font-weight: 600; color: var(--text-1); margin-bottom: 4px; }
+.projectDesc { font-size: 12px; color: var(--text-3); }
+
+.tabs { display: flex; gap: 0; border-bottom: 1px solid var(--border); padding: 0 24px; margin-top: 16px; }
+.tab { font-size: 11px; font-weight: 600; letter-spacing: 0.06em; text-transform: uppercase; color: var(--text-3); background: transparent; border: none; border-bottom: 2px solid transparent; padding: 10px 14px; cursor: pointer; transition: all 100ms; margin-bottom: -1px; }
+.tab:hover { color: var(--text-1); }
+.tabActive { color: var(--amber) !important; border-bottom-color: var(--amber) !important; }
+
+.overview { padding: 20px 24px; display: flex; flex-direction: column; gap: 16px; }
+.statRow { display: flex; gap: 16px; }
+.stat { background: var(--bg-1); border: 1px solid var(--border); border-radius: var(--radius); padding: 16px 20px; display: flex; flex-direction: column; gap: 4px; min-width: 100px; }
+.statVal { font-size: 24px; font-weight: 700; color: var(--amber); font-family: var(--font-mono); }
+.statLabel { font-size: 10px; text-transform: uppercase; letter-spacing: 0.08em; color: var(--text-3); }
+.infoRow { display: flex; align-items: center; gap: 10px; }
+.infoLabel { font-size: 10px; text-transform: uppercase; letter-spacing: 0.06em; color: var(--text-3); }
+.infoVal { font-size: 12px; font-family: var(--font-mono); color: var(--text-2); }
+.descBlock { font-size: 13px; color: var(--text-2); line-height: 1.6; background: var(--bg-1); border: 1px solid var(--border-dim); border-radius: var(--radius); padding: 12px; }
+
+.tabContent { padding: 16px 24px; display: flex; flex-direction: column; gap: 8px; flex: 1; overflow-y: auto; }
+.tabEmpty { font-size: 12px; color: var(--text-3); font-family: var(--font-mono); padding: 16px 0; }
+.inlineForm { display: flex; gap: 8px; align-items: flex-end; margin-bottom: 8px; }
+.inlineForm > :first-child { flex: 1; }
+.roleSelect { background: var(--bg-2); border: 1px solid var(--border); border-radius: var(--radius); color: var(--text-1); font-size: 12px; padding: 6px 8px; font-family: var(--font-sans); cursor: pointer; height: 36px; }
+.listRow { display: flex; align-items: center; gap: 10px; padding: 10px 12px; background: var(--bg-1); border: 1px solid var(--border-dim); border-radius: var(--radius); }
+.listName { flex: 1; font-size: 13px; color: var(--text-1); font-family: var(--font-mono); }
+.listMeta { font-size: 11px; color: var(--text-3); }
+
+.backdrop { position: fixed; inset: 0; background: rgba(7,8,12,0.8); display: flex; align-items: center; justify-content: center; z-index: 100; backdrop-filter: blur(2px); }
+.modal { width: 420px; background: var(--bg-1); border: 1px solid var(--border); border-radius: 10px; padding: 24px; display: flex; flex-direction: column; gap: 16px; animation: scaleIn 150ms ease-out; }
+.modalTitle { font-size: 13px; font-weight: 600; color: var(--text-1); }
+.modalForm { display: flex; flex-direction: column; gap: 12px; }
+.modalFooter { display: flex; justify-content: flex-end; gap: 8px; }

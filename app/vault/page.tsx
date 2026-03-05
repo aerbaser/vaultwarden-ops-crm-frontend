@@ -49,8 +49,16 @@ export default function VaultPage() {
   const [shareTtl, setShareTtl] = useState('24');
   const [shareViews, setShareViews] = useState('3');
   const [shareUrl, setShareUrl] = useState('');
+  const [shareToken, setShareToken] = useState('');
   const [shareLoading, setShareLoading] = useState(false);
   const [shareError, setShareError] = useState('');
+  const [revokeLoading, setRevokeLoading] = useState(false);
+
+  // Favorites / My Space / Shared with me
+  const [favoriteIds, setFavoriteIds] = useState<Set<string>>(new Set());
+  const [mySpaceIds, setMySpaceIds] = useState<Set<string>>(new Set());
+  const [sharedWithMe, setSharedWithMe] = useState<unknown[]>([]);
+  const [sideFilter, setSideFilter] = useState<'all' | 'favorites' | 'myspace' | 'sharedwithme'>('all');
 
   const token = vaultToken || (typeof window !== 'undefined' ? sessionStorage.getItem('vault_token') ?? '' : '');
 
@@ -78,6 +86,13 @@ export default function VaultPage() {
 
     // Load CRM projects
     apiGet('/api/projects').then((p) => { setProjects(p ?? []); setLocalProjects(p ?? []); }).catch(() => {});
+    // Load favorites + my-space + shared-with-me
+    const em = email || (typeof window !== 'undefined' ? sessionStorage.getItem('crm_email') ?? '' : '');
+    if (em) {
+      apiGet(`/api/favorites?userId=${encodeURIComponent(em)}`).then((f: {recordId: string}[]) => setFavoriteIds(new Set(f.map(x => x.recordId)))).catch(() => {});
+      apiGet(`/api/my-space?userId=${encodeURIComponent(em)}`).then((m: {recordId: string}[]) => setMySpaceIds(new Set(m.map(x => x.recordId)))).catch(() => {});
+      apiGet(`/api/shared-with-me?email=${encodeURIComponent(em)}`).then(setSharedWithMe).catch(() => {});
+    }
 
     // If ciphers already in store (from login), just decrypt
     if (ciphers.length > 0 && symKey) {
@@ -113,15 +128,45 @@ export default function VaultPage() {
 
   async function doShare() {
     if (!selected) return;
-    setShareLoading(true); setShareError(''); setShareUrl('');
+    setShareLoading(true); setShareError(''); setShareUrl(''); setShareToken('');
     try {
       const res = await apiPost('/api/share/from-vault', {
         itemName: selected.name, ttlHours: Number(shareTtl), maxViews: Number(shareViews),
       });
       setShareUrl(res.url ?? '');
+      setShareToken(res.token ?? '');
     } catch (e: unknown) {
       setShareError(e instanceof Error ? e.message : 'Share failed');
     } finally { setShareLoading(false); }
+  }
+
+  async function revokeShare() {
+    if (!shareToken) return;
+    setRevokeLoading(true);
+    try { await apiPost('/api/share/revoke', { token: shareToken }); setShareUrl(''); setShareToken(''); }
+    catch { /* ignore */ } finally { setRevokeLoading(false); }
+  }
+
+  async function toggleFavorite(id: string) {
+    const em = email;
+    if (!em) return;
+    if (favoriteIds.has(id)) {
+      setFavoriteIds(prev => { const s = new Set(prev); s.delete(id); return s; });
+    } else {
+      await apiPost('/api/favorites', { userId: em, recordId: id }).catch(() => {});
+      setFavoriteIds(prev => new Set([...prev, id]));
+    }
+  }
+
+  async function toggleMySpace(id: string) {
+    const em = email;
+    if (!em) return;
+    if (mySpaceIds.has(id)) {
+      setMySpaceIds(prev => { const s = new Set(prev); s.delete(id); return s; });
+    } else {
+      await apiPost('/api/my-space', { userId: em, recordId: id }).catch(() => {});
+      setMySpaceIds(prev => new Set([...prev, id]));
+    }
   }
 
   // Decrypt folder names
@@ -145,6 +190,8 @@ export default function VaultPage() {
   }, [symKey, folders]);
 
   const filteredCiphers = decrypted.filter(c => {
+    if (sideFilter === 'favorites') return favoriteIds.has(c.id);
+    if (sideFilter === 'myspace') return mySpaceIds.has(c.id);
     if (selectedFolder) return c.folderId === selectedFolder;
     if (selectedProject) return c.folderId === selectedProject;
     return true;
@@ -175,12 +222,25 @@ export default function VaultPage() {
         {/* Sidebar */}
         <aside className={styles.sidebar}>
           <div className={styles.sideSection}>
-            <div className={styles.sideLabel}>All Items</div>
-            <button className={`${styles.sideItem} ${!selectedProject && !selectedFolder ? styles.sideItemActive : ''}`}
-              onClick={() => select(null, null)}>
-              All items
-              <span className={styles.sideCount}>{decrypted.length}</span>
+            <div className={styles.sideLabel}>Library</div>
+            <button className={`${styles.sideItem} ${sideFilter === 'all' && !selectedProject && !selectedFolder ? styles.sideItemActive : ''}`}
+              onClick={() => { setSideFilter('all'); select(null, null); }}>
+              All items <span className={styles.sideCount}>{decrypted.length}</span>
             </button>
+            <button className={`${styles.sideItem} ${sideFilter === 'favorites' ? styles.sideItemActive : ''}`}
+              onClick={() => { setSideFilter('favorites'); select(null, null); }}>
+              ⭐ Favorites <span className={styles.sideCount}>{favoriteIds.size}</span>
+            </button>
+            <button className={`${styles.sideItem} ${sideFilter === 'myspace' ? styles.sideItemActive : ''}`}
+              onClick={() => { setSideFilter('myspace'); select(null, null); }}>
+              📎 My Space <span className={styles.sideCount}>{mySpaceIds.size}</span>
+            </button>
+            {(sharedWithMe as unknown[]).length > 0 && (
+              <button className={`${styles.sideItem} ${sideFilter === 'sharedwithme' ? styles.sideItemActive : ''}`}
+                onClick={() => setSideFilter('sharedwithme')}>
+                🔗 Shared with me <span className={styles.sideCount}>{(sharedWithMe as unknown[]).length}</span>
+              </button>
+            )}
           </div>
 
           {folderNames.length > 0 && (
@@ -257,6 +317,14 @@ export default function VaultPage() {
             <div className={styles.detailHeader}>
               <div className={styles.detailName}>{selected.name}</div>
               <div className={styles.detailActions}>
+                <button className={styles.iconBtn} title="Favorite"
+                  onClick={() => toggleFavorite(selected.id)} style={{ color: favoriteIds.has(selected.id) ? 'var(--amber)' : 'var(--text-3)' }}>
+                  {favoriteIds.has(selected.id) ? '★' : '☆'}
+                </button>
+                <button className={styles.iconBtn} title="My Space"
+                  onClick={() => toggleMySpace(selected.id)} style={{ color: mySpaceIds.has(selected.id) ? 'var(--teal)' : 'var(--text-3)' }}>
+                  📎
+                </button>
                 <Button variant="ghost" onClick={() => setShareModal(true)}>Share</Button>
                 <button className={styles.closeBtn} onClick={() => setSelected(null)}>✕</button>
               </div>
@@ -350,6 +418,8 @@ export default function VaultPage() {
                   <span className={styles.shareUrlText}>{shareUrl}</span>
                   <button className={`${styles.copyBtn} ${copied === 'share' ? styles.flashed : ''}`}
                     onClick={() => copy(shareUrl, 'share')}>Copy</button>
+                  <Button variant="ghost" loading={revokeLoading} onClick={revokeShare}
+                    style={{ fontSize: '11px', padding: '3px 8px', color: 'var(--danger)' }}>Revoke</Button>
                 </div>
               </div>
             )}
