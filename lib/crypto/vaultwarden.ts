@@ -22,24 +22,6 @@ export class InvalidKdfIterationsError extends Error {
   }
 }
 
-const toHex = (bytes: Uint8Array): string =>
-  Array.from(bytes)
-    .map((byte) => byte.toString(16).padStart(2, "0"))
-    .join("");
-
-const hashSha256 = async (value: string): Promise<string> => {
-  const encoder = new TextEncoder();
-  const payload = encoder.encode(value);
-
-  if (globalThis.crypto?.subtle) {
-    const buffer = await globalThis.crypto.subtle.digest("SHA-256", payload);
-    return toHex(new Uint8Array(buffer));
-  }
-
-  // Fallback for constrained runtime environments.
-  return btoa(value);
-};
-
 const assertSupportedPrelogin = (prelogin: VaultPrelogin): void => {
   if (prelogin.kdf !== "pbkdf2") {
     throw new UnsupportedKdfVariantError(prelogin.kdf);
@@ -49,11 +31,68 @@ const assertSupportedPrelogin = (prelogin: VaultPrelogin): void => {
   }
 };
 
+/**
+ * Derives the Vaultwarden master password hash using the correct PBKDF2 flow:
+ *
+ * 1. masterKey  = PBKDF2-SHA256(password, email, iterations, 256-bit)
+ * 2. masterHash = PBKDF2-SHA256(masterKey, password, 1, 256-bit)
+ * 3. return base64(masterHash)
+ *
+ * This matches the Bitwarden/Vaultwarden web client derivation.
+ */
 export const deriveVaultPasswordHash = async (
   password: string,
   prelogin: VaultPrelogin
 ): Promise<string> => {
   assertSupportedPrelogin(prelogin);
 
-  return hashSha256(`${prelogin.kdf}:${prelogin.iterations}:${prelogin.salt}:${password}`);
+  const enc = new TextEncoder();
+  const passwordBytes = enc.encode(password);
+  const saltBytes = enc.encode(prelogin.salt); // salt = email (lowercased by caller)
+
+  // Import raw password bytes as PBKDF2 key material
+  const baseKey = await crypto.subtle.importKey(
+    "raw",
+    passwordBytes,
+    { name: "PBKDF2" },
+    false,
+    ["deriveBits"]
+  );
+
+  // Step 1: master key = PBKDF2(password, email, iterations, 256 bits)
+  const masterKeyBits = await crypto.subtle.deriveBits(
+    {
+      name: "PBKDF2",
+      hash: "SHA-256",
+      salt: saltBytes,
+      iterations: prelogin.iterations,
+    },
+    baseKey,
+    256
+  );
+  const masterKeyBytes = new Uint8Array(masterKeyBits);
+
+  // Step 2: master hash = PBKDF2(masterKey, password, 1 iteration, 256 bits)
+  const masterKeyMaterial = await crypto.subtle.importKey(
+    "raw",
+    masterKeyBytes,
+    { name: "PBKDF2" },
+    false,
+    ["deriveBits"]
+  );
+
+  const masterHashBits = await crypto.subtle.deriveBits(
+    {
+      name: "PBKDF2",
+      hash: "SHA-256",
+      salt: passwordBytes,
+      iterations: 1,
+    },
+    masterKeyMaterial,
+    256
+  );
+
+  // Step 3: base64-encode the result
+  const masterHashBytes = new Uint8Array(masterHashBits);
+  return btoa(String.fromCharCode(...masterHashBytes));
 };

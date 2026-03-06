@@ -1,3 +1,4 @@
+import React from "react";
 import { render, screen, waitFor } from "@testing-library/react";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import * as shareApi from "@/lib/api/endpoints/share";

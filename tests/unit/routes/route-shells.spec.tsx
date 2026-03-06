@@ -1,3 +1,4 @@
+import React from "react";
 import { render, screen } from "@testing-library/react";
 import LoginPage from "@/app/login/page";
 import VaultPage from "@/app/vault/page";

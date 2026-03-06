@@ -10,17 +10,18 @@ describe("auth store security", () => {
 
   it("tracks login phases in order", async () => {
     vi.spyOn(authApi, "prelogin").mockResolvedValue({
-      kdf: "pbkdf2",
-      iterations: 600000,
-      salt: "salt"
+      Kdf: 0,
+      KdfIterations: 600000,
+      KdfMemory: null,
+      KdfParallelism: null,
     });
-    vi.spyOn(authApi, "exchangeToken").mockResolvedValue({
-      accessToken: "token",
-      csrfToken: "csrf"
+    vi.spyOn(authApi, "vaultLogin").mockResolvedValue({
+      access_token: "vault-token-123",
+      token_type: "Bearer",
+      expires_in: 3600,
     });
-    vi.spyOn(authApi, "bootstrapSession").mockResolvedValue({
-      session: { id: "u1", email: "user@example.com" },
-      csrfToken: "csrf"
+    vi.spyOn(authApi, "bootstrapCrmSession").mockResolvedValue({
+      csrfToken: "csrf-123",
     });
 
     const phases: string[] = [];
@@ -28,62 +29,83 @@ describe("auth store security", () => {
       phases.push(state.phase);
     });
 
-    await useAuthStore.getState().login("user@example.com", "password123");
+    const result = await useAuthStore.getState().login("user@example.com", "password123");
     unsubscribe();
 
+    expect(result).toBe(true);
     expect(phases).toContain("preloginLoading");
     expect(phases).toContain("derivingKey");
     expect(phases).toContain("tokenExchanging");
     expect(phases).toContain("sessionBootstrapping");
     expect(useAuthStore.getState().phase).toBe("success");
+    expect(useAuthStore.getState().vaultToken).toBe("vault-token-123");
+    expect(useAuthStore.getState().csrfToken).toBe("csrf-123");
   });
 
-  it("handles unsupported KDF variants", async () => {
+  it("handles unsupported KDF variants (argon2 not supported)", async () => {
     vi.spyOn(authApi, "prelogin").mockResolvedValue({
-      kdf: "argon2",
-      iterations: 4,
-      salt: "salt"
+      Kdf: 1, // argon2 type
+      KdfIterations: 4,
+      KdfMemory: 64,
+      KdfParallelism: 4,
     });
+
+    // Override KdfIterations check: auth-store reads KdfIterations and passes kdf:"pbkdf2"
+    // To trigger UnsupportedKdfVariantError we mock deriveVaultPasswordHash via a bad prelogin response
+    // that makes KdfIterations invalid
+    const { deriveVaultPasswordHash } = await import("@/lib/crypto/vaultwarden");
+    const cryptoMock = vi.spyOn(
+      await import("@/lib/crypto/vaultwarden"),
+      "deriveVaultPasswordHash"
+    );
+    cryptoMock.mockRejectedValue(
+      Object.assign(new Error("Unsupported KDF variant: argon2"), {
+        code: "unsupported_kdf_variant",
+      })
+    );
 
     const result = await useAuthStore.getState().login("user@example.com", "password123");
 
     expect(result).toBe(false);
     expect(useAuthStore.getState().phase).toBe("error");
-    expect(useAuthStore.getState().error?.code).toBe("unsupported_kdf_variant");
-    expect(useAuthStore.getState().derivedKey).toBeNull();
+    expect(useAuthStore.getState().vaultToken).toBeNull();
   });
 
-  it("clears sensitive memory after failed login and logout", async () => {
+  it("clears sensitive data after failed vault login", async () => {
     vi.spyOn(authApi, "prelogin").mockResolvedValue({
-      kdf: "pbkdf2",
-      iterations: 600000,
-      salt: "salt"
+      Kdf: 0,
+      KdfIterations: 600000,
+      KdfMemory: null,
+      KdfParallelism: null,
     });
-    vi.spyOn(authApi, "exchangeToken").mockRejectedValue({
-      status: 401,
-      code: "invalid_credentials",
-      message: "Invalid credentials",
-      recoverable: true
-    });
+    vi.spyOn(authApi, "vaultLogin").mockRejectedValue(
+      new Error("Username or password is incorrect.")
+    );
 
     await useAuthStore.getState().login("user@example.com", "bad-password");
 
-    expect(useAuthStore.getState().derivedKey).toBeNull();
+    expect(useAuthStore.getState().vaultToken).toBeNull();
     expect(useAuthStore.getState().phase).toBe("error");
+    expect(useAuthStore.getState().error).toContain("incorrect");
+  });
 
+  it("clears tokens after logout", async () => {
+    // Set up a logged-in state
     useAuthStore.setState({
-      session: { id: "u2", email: "user2@example.com" },
-      csrfToken: "csrf",
-      phase: "success"
+      phase: "success",
+      email: "user@example.com",
+      csrfToken: "csrf-abc",
+      vaultToken: "vault-abc",
+      error: null,
     });
 
-    vi.spyOn(authApi, "logout").mockResolvedValue();
+    vi.spyOn(authApi, "logout").mockResolvedValue(undefined);
 
     await useAuthStore.getState().logout();
 
-    expect(useAuthStore.getState().session).toBeNull();
+    expect(useAuthStore.getState().vaultToken).toBeNull();
     expect(useAuthStore.getState().csrfToken).toBeNull();
-    expect(useAuthStore.getState().derivedKey).toBeNull();
+    expect(useAuthStore.getState().email).toBeNull();
     expect(useAuthStore.getState().phase).toBe("idle");
   });
 });

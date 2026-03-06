@@ -88,7 +88,7 @@ export function LoginForm() {
 
       {error ? (
         <p role="alert" style={{ color: "var(--danger)", marginTop: "0.5rem" }} data-testid="login-error">
-          {error.message}
+          {typeof error === "string" ? error : (error as { message?: string })?.message ?? "Login failed"}
         </p>
       ) : null}
 

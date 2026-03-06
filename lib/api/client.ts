@@ -1,6 +1,9 @@
 import { ApiError, ApiRequestOptions, HttpMethod } from "@/lib/api/types";
 
-const DEFAULT_API_BASE_URL = "http://localhost:3001";
+// Always use relative paths so that requests go through the Next.js proxy
+// (rewrites in next.config.mjs forward /api/* → http://localhost:3001/api/*)
+// This works both locally and when accessed via Tailscale / reverse-proxy.
+const DEFAULT_API_BASE_URL = "";
 
 let authFailureHandler: ((error: ApiError) => void) | undefined;
 
@@ -12,7 +15,7 @@ export const registerAuthFailureHandler = (handler: (error: ApiError) => void): 
 };
 
 const getApiBaseUrl = (): string => {
-  return process.env.NEXT_PUBLIC_API_URL ?? DEFAULT_API_BASE_URL;
+  return DEFAULT_API_BASE_URL;
 };
 
 const normalizeApiError = (status: number, payload: unknown): ApiError => {
