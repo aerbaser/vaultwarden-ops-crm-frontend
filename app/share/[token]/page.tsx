@@ -4,8 +4,6 @@ import { useParams } from 'next/navigation';
 import Badge from '@/components/ui/Badge';
 import styles from './share.module.css';
 
-const BASE = process.env.NEXT_PUBLIC_API_URL ?? 'http://localhost:3001';
-
 export default function SharePage() {
   const { token } = useParams<{ token: string }>();
   const [data, setData] = useState<any>(null);
@@ -14,7 +12,7 @@ export default function SharePage() {
   const [copied, setCopied] = useState(false);
 
   useEffect(() => {
-    fetch(`${BASE}/api/share/open`, { method:'POST', headers:{'content-type':'application/json'}, body: JSON.stringify({ token }) })
+    fetch(`/api/share/open`, { method:'POST', headers:{'content-type':'application/json'}, body: JSON.stringify({ token }) })
       .then(r => r.json()).then(setData).catch(e => setError(e.message));
   }, [token]);
 
@@ -38,15 +36,40 @@ export default function SharePage() {
               <Badge color={ttlMin < 60 ? 'amber' : 'teal'}>{ttlMin}m remaining</Badge>
               <Badge color="muted">{data.viewsLeft} views left</Badge>
             </div>
-            <div className={styles.field}><span className={styles.label}>Username</span><span className={styles.mono}>{data.username ?? '—'}</span></div>
-            <div className={styles.field}>
-              <span className={styles.label}>Password</span>
-              <div className={styles.passwordRow}>
-                <span className={styles.mono}>{revealed ? (data.password ?? '—') : '••••••••••'}</span>
-                <button className={styles.revealBtn} onClick={() => setRevealed(!revealed)}>{revealed ? 'Hide' : 'Show'}</button>
-                {data.password && <button className={`${styles.copyBtn} ${copied ? styles.flashed : ''}`} onClick={() => copy(data.password)}>Copy</button>}
+            {/* Card fields */}
+            {data.number && <>
+              {data.name && <div className={styles.field}><span className={styles.label}>Card Name</span><span className={styles.mono}>{data.name}</span></div>}
+              {data.holder && <div className={styles.field}><span className={styles.label}>Cardholder</span><span className={styles.mono}>{data.holder}</span></div>}
+              <div className={styles.field}>
+                <span className={styles.label}>{data.brand ? data.brand + ' Card' : 'Card Number'}</span>
+                <div className={styles.passwordRow}>
+                  <span className={styles.mono}>{revealed ? data.number : '•••• •••• •••• ' + data.number.slice(-4)}</span>
+                  <button className={styles.revealBtn} onClick={() => setRevealed(!revealed)}>{revealed ? 'Hide' : 'Show'}</button>
+                  <button className={`${styles.copyBtn} ${copied ? styles.flashed : ''}`} onClick={() => copy(data.number)}>Copy</button>
+                </div>
               </div>
-            </div>
+              {data.expMonth && data.expYear && <div className={styles.field}><span className={styles.label}>Expires</span><span className={styles.mono}>{data.expMonth}/{data.expYear}</span></div>}
+              {data.code && <div className={styles.field}>
+                <span className={styles.label}>CVV</span>
+                <div className={styles.passwordRow}>
+                  <span className={styles.mono}>{revealed ? data.code : '•••'}</span>
+                  <button className={styles.revealBtn} onClick={() => setRevealed(!revealed)}>{revealed ? 'Hide' : 'Show'}</button>
+                  <button className={`${styles.copyBtn} ${copied ? styles.flashed : ''}`} onClick={() => copy(data.code)}>Copy</button>
+                </div>
+              </div>}
+            </>}
+            {/* Login fields (non-card) */}
+            {!data.number && <>
+              {data.username && <div className={styles.field}><span className={styles.label}>Username</span><span className={styles.mono}>{data.username}</span></div>}
+              {data.password && <div className={styles.field}>
+                <span className={styles.label}>Password</span>
+                <div className={styles.passwordRow}>
+                  <span className={styles.mono}>{revealed ? data.password : '••••••••••'}</span>
+                  <button className={styles.revealBtn} onClick={() => setRevealed(!revealed)}>{revealed ? 'Hide' : 'Show'}</button>
+                  <button className={`${styles.copyBtn} ${copied ? styles.flashed : ''}`} onClick={() => copy(data.password)}>Copy</button>
+                </div>
+              </div>}
+            </>}
             {data.url && <div className={styles.field}><span className={styles.label}>URL</span><a href={data.url} className={styles.mono} target="_blank">{data.url}</a></div>}
           </>
         )}

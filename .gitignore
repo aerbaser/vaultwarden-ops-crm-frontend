@@ -31,6 +31,9 @@ yarn-error.log*
 # vercel
 .vercel
 
+# runtime-generated share pages
+/public/s/
+
 # typescript
 *.tsbuildinfo
 next-env.d.ts
