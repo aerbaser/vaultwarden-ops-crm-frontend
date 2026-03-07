@@ -9,8 +9,13 @@ import { ProjectTree } from "@/components/vault/project-tree";
 import { RecordList } from "@/components/vault/record-list";
 import { RecordDetail } from "@/components/vault/record-detail";
 
+function typeLabel(t: number): string {
+  return t === 1 ? "Login" : t === 2 ? "Note" : t === 3 ? "Card" : t === 4 ? "Identity" : "Item";
+}
+
 export function VaultShell() {
   const csrfToken = useAuthStore((state) => state.csrfToken);
+  const vaultCiphers = useAuthStore((state) => state.ciphers);
   const projects = useVaultStore((state) => state.projects);
   const folders = useVaultStore((state) => state.folders);
   const records = useVaultStore((state) => state.records);
@@ -179,6 +184,52 @@ export function VaultShell() {
           generatedShareUrl={generatedShareUrl}
         />
       </div>
+
+      {vaultCiphers.length > 0 && (
+        <section className="route-card" style={{ marginTop: "1.5rem" }} data-testid="vault-ciphers">
+          <h2>Vault Items ({vaultCiphers.length})</h2>
+          <p style={{ fontSize: "0.8rem", color: "var(--text-muted)", marginBottom: "0.75rem" }}>
+            Decrypted from Vaultwarden
+          </p>
+          <ul style={{ listStyle: "none", padding: 0, margin: 0, display: "grid", gap: "0.5rem" }}>
+            {vaultCiphers.map((cipher) => (
+              <li
+                key={cipher.id}
+                style={{
+                  padding: "0.6rem 0.9rem",
+                  background: "var(--surface-2, #f5f5f5)",
+                  borderRadius: "6px",
+                  display: "flex",
+                  alignItems: "center",
+                  gap: "0.75rem"
+                }}
+              >
+                <span
+                  style={{
+                    fontSize: "0.65rem",
+                    fontWeight: 600,
+                    textTransform: "uppercase",
+                    background: "var(--accent, #2563eb)",
+                    color: "#fff",
+                    padding: "2px 6px",
+                    borderRadius: "4px",
+                    minWidth: "42px",
+                    textAlign: "center"
+                  }}
+                >
+                  {typeLabel(cipher.type)}
+                </span>
+                <span style={{ fontWeight: 500 }}>{cipher.name || "(no name)"}</span>
+                {cipher.username ? (
+                  <span style={{ fontSize: "0.8rem", color: "var(--text-muted)" }}>
+                    {cipher.username}
+                  </span>
+                ) : null}
+              </li>
+            ))}
+          </ul>
+        </section>
+      )}
     </section>
   );
 }

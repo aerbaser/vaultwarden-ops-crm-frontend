@@ -136,7 +136,12 @@ export const useVaultStore = create<VaultState>((set, get) => ({
     set({ loading: true, error: null, activeRequestId: requestId });
 
     try {
-      const response = await syncFolderRecords(folderId, requestId);
+      // Get vault token from sessionStorage (set during login)
+      const vaultToken =
+        typeof sessionStorage !== "undefined"
+          ? (sessionStorage.getItem("vault_token") ?? undefined)
+          : undefined;
+      const response = await syncFolderRecords(folderId, requestId, vaultToken);
 
       // Ignore stale responses when the user changes folders quickly.
       if (get().activeRequestId !== requestId) {

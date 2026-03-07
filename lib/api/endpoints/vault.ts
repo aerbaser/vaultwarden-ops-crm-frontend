@@ -22,14 +22,18 @@ export type CreateRecordInput = {
   encryptedPayload: string;
 };
 
-export const fetchVaultSummary = () =>
-  apiRequest<VaultSummary>("/api/vault/summary", {
-    method: "GET"
-  });
+export const fetchVaultSummary = async (): Promise<VaultSummary> => {
+  const [projects, folders] = await Promise.all([
+    apiRequest<Project[]>("/api/projects", { method: "GET" }),
+    apiRequest<Folder[]>("/api/folders", { method: "GET" }),
+  ]);
+  return { projects, folders };
+};
 
-export const syncFolderRecords = (folderId: string, requestId: string) =>
+export const syncFolderRecords = (folderId: string, requestId: string, vaultToken?: string) =>
   apiRequest<VaultSyncResponse>(`/api/vault/folders/${folderId}/sync?requestId=${encodeURIComponent(requestId)}`, {
-    method: "GET"
+    method: "GET",
+    headers: vaultToken ? { authorization: `Bearer ${vaultToken}` } : undefined,
   });
 
 export const createProject = (payload: CreateProjectInput, csrfToken?: string) =>

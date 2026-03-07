@@ -9,6 +9,7 @@ const phaseMessages: Record<string, string> = {
   preloginLoading: "Fetching security profile...",
   derivingKey: "Deriving Vaultwarden key material...",
   tokenExchanging: "Exchanging credentials for a session token...",
+  vaultSyncing: "Syncing vault items...",
   sessionBootstrapping: "Bootstrapping secure session...",
   success: "Authentication complete. Redirecting...",
   error: "Authentication failed. Review details and retry."
@@ -28,6 +29,7 @@ export function LoginForm() {
     phase === "preloginLoading" ||
     phase === "derivingKey" ||
     phase === "tokenExchanging" ||
+    phase === "vaultSyncing" ||
     phase === "sessionBootstrapping";
 
   const statusMessage = useMemo(() => phaseMessages[phase] ?? phaseMessages.idle, [phase]);
